@@ -5,6 +5,8 @@
 extern crate syntex_syntax;
 extern crate toml;
 extern crate env_logger;
+extern crate rustc_serialize;
+extern crate docopt;
 
 extern crate racer;
 
@@ -149,17 +151,6 @@ fn find_definition(args: &[String]) {
 }
 
 #[cfg(not(test))]
-fn print_usage() {
-    let program = std::env::args().next().unwrap().clone();
-    println!("usage: {} complete linenum charnum fname [substitute_file]", program);
-    println!("or:    {} find-definition linenum charnum fname [substitute_file]", program);
-    println!("or:    {} complete fullyqualifiedname   (e.g. std::io::)", program);
-    println!("or:    {} prefix linenum charnum fname", program);
-    println!("or replace complete with complete-with-snippet for more detailed completions.");
-    println!("or:    {} daemon     - to start a process that receives the above commands via stdin", program);
-}
-
-#[cfg(not(test))]
 fn check_rust_src_env_var() {
     if let Ok(srcpaths) = std::env::var("RUST_SRC_PATH") {
         let v = srcpaths.split(PATH_SEP).collect::<Vec<_>>();
@@ -189,11 +180,61 @@ fn daemon() {
         }
         let args: Vec<String> = input.split(" ").map(|s| s.trim().to_string()).collect();
         run(&args);
-        
+
         input.clear();
     }
 }
 
+static USAGE: &'static str = "
+Rust code completion utility
+
+Usage:
+  racer daemon
+  racer complete <linenum> <charnum> <fname> [--substitute_file]
+  racer complete-with-snippet <linenum> <charnum> <fname> [--substitute_file]
+  racer find-definition <linenum> <charnum> <fname> [--substitute_file]
+  racer complete <fully-qualified-name>
+  racer complete-with-snippet <fully-qualified-name>
+  racer prefix <linenum> <charnum> <fname>
+  racer (-h | --help)
+  racer --version
+
+Options:
+  -h, --help  Show this screen.
+  --version   Show version.
+
+Commands:
+  daemon                : Start a process that receives the above commands via stdin
+  prefix                :
+  find_definition       :
+  complete              : Provide a completion
+  complete_with_snippet : Provide a more detailed completion
+";
+
+#[cfg(not(test))]
+#[derive(Debug, RustcDecodable)]
+struct Args {
+    cmd_daemon: bool,
+
+    cmd_complete: bool,
+    arg_linenum: isize,
+    arg_charnum: isize,
+    arg_fname: String,
+    arg_substitute_file: Option<String>,
+
+    cmd_find_definition: bool,
+
+    arg_fully_qualified_name: String,
+
+    cmd_prefix: bool,
+
+    cmd_complete_with_snippet: bool,
+}
+
+#[cfg(not(test))]
+fn print_usage() {
+    println!("{}", USAGE);
+}
 
 #[cfg(not(test))]
 fn main() {
@@ -206,6 +247,11 @@ fn main() {
         print_usage();
         std::process::exit(1);
     }
+
+    let a: Args = docopt::Docopt::new(USAGE)
+        .and_then(|d| d.decode())
+        .unwrap_or_else(|e| e.exit());
+    println!("{:?}", a);
 
     let args = &args[1..];
     run(args);
