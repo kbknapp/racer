@@ -190,9 +190,9 @@ Rust code completion utility
 
 Usage:
   racer daemon
-  racer complete <linenum> <charnum> <fname> [--substitute_file]
-  racer complete-with-snippet <linenum> <charnum> <fname> [--substitute_file]
-  racer find-definition <linenum> <charnum> <fname> [--substitute_file]
+  racer complete <linenum> <charnum> <fname> [--substitute-file]
+  racer complete-with-snippet <linenum> <charnum> <fname> [--substitute-file]
+  racer find-definition <linenum> <charnum> <fname> [--substitute-file]
   racer complete <fully-qualified-name>
   racer complete-with-snippet <fully-qualified-name>
   racer prefix <linenum> <charnum> <fname>
@@ -200,8 +200,9 @@ Usage:
   racer --version
 
 Options:
-  -h, --help  Show this screen.
-  --version   Show version.
+  --substitute-file
+  -h, --help         Show this screen.
+  --version          Show version.
 
 Commands:
   daemon                : Start a process that receives the above commands via stdin
@@ -220,7 +221,7 @@ struct Args {
     arg_linenum: usize,
     arg_charnum: usize,
     arg_fname: String,
-    arg_substitute_file: Option<String>,
+    flag_substitute_file: Option<String>,
 
     cmd_find_definition: bool,
 
