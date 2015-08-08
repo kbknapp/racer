@@ -217,8 +217,8 @@ struct Args {
     cmd_daemon: bool,
 
     cmd_complete: bool,
-    arg_linenum: isize,
-    arg_charnum: isize,
+    arg_linenum: usize,
+    arg_charnum: usize,
     arg_fname: String,
     arg_substitute_file: Option<String>,
 
