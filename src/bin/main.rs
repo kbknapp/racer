@@ -252,7 +252,6 @@ fn main() {
     let a: Args = docopt::Docopt::new(USAGE)
         .and_then(|d| d.decode())
         .unwrap_or_else(|e| e.exit());
-    println!("{:?}", a);
 
     let args = &args[1..];
     run(args);
